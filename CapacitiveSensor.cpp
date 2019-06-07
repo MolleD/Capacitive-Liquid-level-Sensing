@@ -1,4 +1,4 @@
-/*
+ /*
  CapacitiveSense.h - Capacitive Sensing Library for 'duino / Wiring
  https://github.com/PaulStoffregen/CapacitiveSensor
  http://www.pjrc.com/teensy/td_libs_CapacitiveSensor.html
@@ -154,7 +154,7 @@ long CapacitiveSensor::capacitiveSensorRaw(uint8_t samples)
 	if (error < 0) return -1;                  // bad pin - this appears not to work
 
 	for (uint8_t i = 0; i < samples; i++) {    // loop for samples parameter - simple lowpass filter
-		if (SenseOneCycle() < 0)  return -2;   // variable over timeout
+		if (SenseOneCycle() < 0)  return -2;     // variable over timeout
 	}
 
 	return total;
@@ -185,23 +185,36 @@ int CapacitiveSensor::SenseOneCycle(void)
     noInterrupts();
 	DIRECT_WRITE_LOW(s1Reg, s1Bit);	        // sendPin1 Register low
   DIRECT_WRITE_LOW(s2Reg, s2Bit);         // sendPin2 Register low
-  DIRECT_WRITE_LOW(s3Reg, s3Bit);         // sendPin3 Register low
-	DIRECT_MODE_INPUT(rReg, rBit);	      // receivePin to input (pullups are off)
+  DIRECT_WRITE_HIGH(s3Reg, s3Bit);        // sendPin3 Register low
+  
+	DIRECT_MODE_INPUT(rReg, rBit);	        // receivePin to input (pullups are off)
   DIRECT_MODE_INPUT(r2Reg, r2Bit);        // receivePin2 to input (pullups are off)
   DIRECT_MODE_INPUT(r3Reg, r3Bit);        // receivePin3 to input (pullups are off)
-	DIRECT_MODE_OUTPUT(rReg, rBit);       // receivePin to OUTPUT
+  
+	DIRECT_MODE_OUTPUT(rReg, rBit);         // receivePin to OUTPUT
   DIRECT_MODE_OUTPUT(r2Reg, r2Bit);       // receivePin2 to OUTPUT
-  DIRECT_MODE_OUTPUT(r3Reg, r3Bit);       // receivePin3 to OUTPUT
-	DIRECT_WRITE_LOW(rReg, rBit);       	// pin is now LOW AND OUTPUT
+  
+	DIRECT_WRITE_LOW(rReg, rBit);       	  // pin is now LOW AND OUTPUT
   DIRECT_WRITE_LOW(r2Reg, r2Bit);         // pin is now LOW AND OUTPUT
-  DIRECT_WRITE_LOW(r3Reg, r3Bit);         // pin is now LOW AND OUTPUT
+  
 	delayMicroseconds(10);
-	DIRECT_MODE_INPUT(rReg, rBit);	      // receivePin to input (pullups are off)	
+  
+  
+	DIRECT_MODE_INPUT(rReg, rBit);	        // receivePin to input (pullups are off)	
   DIRECT_MODE_INPUT(r2Reg, r2Bit);        // receivePin2 to input (pullups are off) 
+  DIRECT_WRITE_HIGH(r3Reg, r3Bit);
+  DIRECT_MODE_OUTPUT(r3Reg, r3Bit);        // receivePin3 to input (pullups are off)
+  DIRECT_WRITE_HIGH(r3Reg, r3Bit);
+ 
+  
+    
   DIRECT_MODE_INPUT(r3Reg, r3Bit);        // receivePin3 to input (pullups are off)
+  DIRECT_WRITE_LOW(s3Reg, s3Bit);         // sendPin3 LOW
+  
+  
   DIRECT_WRITE_HIGH(s1Reg, s1Bit);        // sendPin1 High   
-  DIRECT_WRITE_HIGH(s2Reg, s2Bit);        // sendPin2 High     
-  DIRECT_WRITE_HIGH(s3Reg, s3Bit);        // sendPin3 High
+  DIRECT_WRITE_HIGH(s2Reg, s2Bit);        // sendPin2 High
+   
 
     interrupts();
 
@@ -217,34 +230,47 @@ int CapacitiveSensor::SenseOneCycle(void)
 
 	// set receive pin HIGH briefly to charge up fully - because the while loop above will exit when pin is ~ 2.5V
     noInterrupts();
+  DIRECT_MODE_OUTPUT(r3Reg, r3Bit);
+  DIRECT_WRITE_LOW(r3Reg, r3Bit); 
 	DIRECT_WRITE_HIGH(rReg, rBit);
   DIRECT_WRITE_HIGH(r2Reg, r2Bit);
   //DIRECT_WRITE_HIGH(r3Reg, r3Bit);
-	DIRECT_MODE_OUTPUT(rReg, rBit);   // receivePin to OUTPUT - pin is now HIGH AND OUTPUT
-  DIRECT_MODE_OUTPUT(r2Reg, r2Bit); // receivePin2 to OUTPUT - pin is now HIGH AND OUTPUT
-  //DIRECT_MODE_OUTPUT(r3Reg, r3Bit); // receivePin3 to OUTPUT - pin is now HIGH AND OUTPUT
+  
+	DIRECT_MODE_OUTPUT(rReg, rBit);       // receivePin to OUTPUT - pin is now HIGH AND OUTPUT
+  DIRECT_MODE_OUTPUT(r2Reg, r2Bit);     // receivePin2 to OUTPUT - pin is now HIGH AND OUTPUT
+  //DIRECT_MODE_OUTPUT(r3Reg, r3Bit);   // receivePin3 to OUTPUT - pin is now HIGH AND OUTPUT
+  
 	DIRECT_WRITE_HIGH(rReg, rBit);
   DIRECT_WRITE_HIGH(r2Reg, r2Bit);
-  //DIRECT_WRITE_HIGH(r3Reg, r3Bit);
-	DIRECT_MODE_INPUT(rReg, rBit);	  // receivePin to INPUT (pullup is off)
-  DIRECT_MODE_INPUT(r2Reg, r2Bit);  // receivePin2 to INPUT (pullup is off)
-  //DIRECT_MODE_INPUT(r3Reg, r3Bit);  // receivePin3 to INPUT (pullup is off)
-	DIRECT_WRITE_LOW(s1Reg, s1Bit);	  // sendPin1 LOW
-  DIRECT_WRITE_LOW(s2Reg, s2Bit);   // sendPin2 LOW
-  DIRECT_WRITE_LOW(s3Reg, s3Bit);   // sendPin2 LOW
+  
+  
+	DIRECT_MODE_INPUT(rReg, rBit);	      // receivePin to INPUT (pullup is off)
+  DIRECT_MODE_INPUT(r2Reg, r2Bit);      // receivePin2 to INPUT (pullup is off)
+  //DIRECT_MODE_INPUT(r3Reg, r3Bit);    // receivePin3 to INPUT (pullup is off)
+  
+	DIRECT_WRITE_LOW(s1Reg, s1Bit);	      // sendPin1 LOW
+  DIRECT_WRITE_LOW(s2Reg, s2Bit);       // sendPin2 LOW
+  DIRECT_WRITE_HIGH(s3Reg, s3Bit);      // sendPin3 HIGH
+  DIRECT_MODE_INPUT(r3Reg, r3Bit);    // receivePin3 to INPUT (pullup is off)
+
+  
+  
     interrupts();
+ 
 
 #ifdef FIVE_VOLT_TOLERANCE_WORKAROUND
-	DIRECT_MODE_OUTPUT(rReg, rBit);
+ DIRECT_MODE_OUTPUT(rReg, rBit);
  DIRECT_MODE_OUTPUT(r2Reg, r2Bit);
  DIRECT_MODE_OUTPUT(r3Reg, r3Bit);
-	DIRECT_WRITE_LOW(rReg, rBit);
+ 
+ DIRECT_WRITE_LOW(rReg, rBit);
  DIRECT_WRITE_LOW(r2Reg, r2Bit);
  DIRECT_WRITE_LOW(r3Reg, r3Bit);
 	delayMicroseconds(10);
-	DIRECT_MODE_INPUT(rReg, rBit);	// receivePin to INPUT (pullup is off)
-  DIRECT_MODE_INPUT(r2Reg, r2Bit);  // receivePin2 to INPUT (pullup is off)
-  DIRECT_MODE_INPUT(r3Reg, r3Bit);  // receivePin3 to INPUT (pullup is off)
+	DIRECT_MODE_INPUT(rReg, rBit);	    // receivePin to INPUT (pullup is off)
+  DIRECT_MODE_INPUT(r2Reg, r2Bit);    // receivePin2 to INPUT (pullup is off)
+  DIRECT_MODE_INPUT(r3Reg, r3Bit);    // receivePin3 to INPUT (pullup is off)
+  DIRECT_WRITE_LOW(s3Reg, s3Bit);
 #else
 	while ( DIRECT_READ(rReg, rBit) && (total < CS_Timeout_Millis) ) {  // while receive pin is HIGH  AND total is less than timeout
 		total++;
@@ -254,7 +280,7 @@ int CapacitiveSensor::SenseOneCycle(void)
 	//Serial.println(total);
 
 	if (total >= CS_Timeout_Millis) {
-		return -2;     // total variable over timeout
+		return -2;                        // total variable over timeout
 	} else {
 		return 1;
 	}
